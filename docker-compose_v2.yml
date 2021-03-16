@@ -1,0 +1,33 @@
+version: '2.1'
+
+volumes:
+  db-data:
+  pgadmin-data:
+
+services:
+  db:
+    image: postgres:latest
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=jdb
+      - POSTGRES_USER=jjcfrank
+      - POSTGRES_PASS=jjcfrank
+      - POSTGRES_MULTIPLE_EXTENSIONS=postgis,hstore,postgis_topology,postgis_raster,pgrouting
+    restart: on-failure
+    healthcheck:
+      test: "exit 0"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    volumes:
+      - pgadmin-data:/pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "80:80"
+    depends_on:
+      db:
+        condition: service_healthy
